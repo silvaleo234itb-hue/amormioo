@@ -1,0 +1,6 @@
+{
+  "name": "Cartas de Amor - Nosso Álbum Digital",
+  "description": "Um presente digital romântico, elegante e interativo: cartas de amor, memórias fotográficas em tempo real, linha do tempo juntos e notificações.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

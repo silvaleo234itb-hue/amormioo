@@ -1,0 +1,322 @@
+{
+  "entities": {
+    "Letter": {
+      "title": "Letter",
+      "description": "Uma carta romântica publicada ou rascunho com conteúdo, fotos e estilização.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Identificador único da carta",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "order": {
+          "type": "number",
+          "description": "Posição ordinal da carta no álbum"
+        },
+        "title": {
+          "type": "string",
+          "description": "Título principal da carta",
+          "maxLength": 200
+        },
+        "subtitle": {
+          "type": "string",
+          "description": "Subtítulo carinhoso da carta",
+          "maxLength": 500
+        },
+        "date": {
+          "type": "string",
+          "description": "Data exibida da carta",
+          "maxLength": 100
+        },
+        "highlightPhrase": {
+          "type": "string",
+          "description": "Frase de destaque no topo da carta",
+          "maxLength": 500
+        },
+        "content": {
+          "type": "string",
+          "description": "Conteúdo textual da carta",
+          "maxLength": 50000
+        },
+        "signature": {
+          "type": "string",
+          "description": "Assinatura carinhosa ao final da carta",
+          "maxLength": 200
+        },
+        "emoji": {
+          "type": "string",
+          "description": "Emoji temático da carta",
+          "maxLength": 20
+        },
+        "images": {
+          "type": "array",
+          "description": "Lista de fotos anexadas à carta"
+        },
+        "videoUrl": {
+          "type": "string",
+          "description": "URL opcional de vídeo romântico",
+          "maxLength": 1000
+        },
+        "animationIn": {
+          "type": "string",
+          "description": "Tipo de animação de entrada",
+          "maxLength": 50
+        },
+        "backgroundTheme": {
+          "type": "string",
+          "description": "Tema visual do papel de fundo",
+          "maxLength": 50
+        },
+        "particleType": {
+          "type": "string",
+          "description": "Partículas flutuantes da carta",
+          "maxLength": 50
+        },
+        "particleIntensity": {
+          "type": "string",
+          "description": "Intensidade das partículas",
+          "maxLength": 50
+        },
+        "imagePosition": {
+          "type": "string",
+          "description": "Disposição das imagens na carta",
+          "maxLength": 50
+        },
+        "published": {
+          "type": "boolean",
+          "description": "Indica se a carta está pública para leitura"
+        },
+        "isFinalLetter": {
+          "type": "boolean",
+          "description": "Indica se é a carta final do álbum"
+        },
+        "postType": {
+          "type": "string",
+          "description": "Tipo da postagem",
+          "maxLength": 50
+        },
+        "category": {
+          "type": "string",
+          "description": "Categoria da postagem",
+          "maxLength": 100
+        },
+        "location": {
+          "type": "string",
+          "description": "Localização associada à carta",
+          "maxLength": 200
+        },
+        "likesCount": {
+          "type": "number",
+          "description": "Contagem de corações/curtidas recebidas"
+        },
+        "likedBy": {
+          "type": "array",
+          "description": "Lista de identificadores de quem curtiu a carta"
+        },
+        "isLiked": {
+          "type": "boolean",
+          "description": "Flag local se o usuário atual curtiu"
+        },
+        "comments": {
+          "type": "array",
+          "description": "Recadinhos e comentários deixados na carta"
+        },
+        "isPinned": {
+          "type": "boolean",
+          "description": "Se a carta está fixada no topo"
+        },
+        "authorId": {
+          "type": "string",
+          "description": "Identificador do perfil autor (he | she)",
+          "maxLength": 50
+        },
+        "authorName": {
+          "type": "string",
+          "description": "Nome do autor",
+          "maxLength": 100
+        },
+        "recipientName": {
+          "type": "string",
+          "description": "Nome do destinatário",
+          "maxLength": 100
+        },
+        "authorUid": {
+          "type": "string",
+          "description": "Firebase Auth UID do autor",
+          "maxLength": 128
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Data ISO da última atualização",
+          "maxLength": 100
+        }
+      },
+      "required": ["id", "order", "title", "content", "published"]
+    },
+    "AlbumConfig": {
+      "title": "AlbumConfig",
+      "description": "Configurações gerais do álbum do casal",
+      "type": "object",
+      "properties": {
+        "recipientName": {
+          "type": "string",
+          "description": "Nome da destinatária (ex: Meu Amor)",
+          "maxLength": 100
+        },
+        "senderName": {
+          "type": "string",
+          "description": "Nome do autor principal (ex: Leo)",
+          "maxLength": 100
+        },
+        "coverTitle": {
+          "type": "string",
+          "description": "Título exibido na capa",
+          "maxLength": 200
+        },
+        "coverSubtitle": {
+          "type": "string",
+          "description": "Subtítulo da capa",
+          "maxLength": 300
+        },
+        "coverButtonText": {
+          "type": "string",
+          "description": "Texto do botão de abrir o envelope",
+          "maxLength": 100
+        },
+        "musicEnabled": {
+          "type": "boolean",
+          "description": "Se a música está habilitada"
+        },
+        "musicVolume": {
+          "type": "number",
+          "description": "Volume padrão da trilha sonora (0 a 1)"
+        },
+        "relationshipStartDate": {
+          "type": "string",
+          "description": "Data de início do relacionamento",
+          "maxLength": 100
+        },
+        "heUser": {
+          "type": "object",
+          "description": "Perfil de Ele"
+        },
+        "sheUser": {
+          "type": "object",
+          "description": "Perfil de Ela"
+        },
+        "authorizedEmails": {
+          "type": "array",
+          "description": "Lista de e-mails autorizados a editar o álbum"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Data ISO da última atualização",
+          "maxLength": 100
+        }
+      },
+      "required": ["recipientName", "senderName", "coverTitle"]
+    },
+    "TimelineMemory": {
+      "title": "TimelineMemory",
+      "description": "Foto e registro de data na linha do tempo Nosso Tempo Juntos",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Identificador da memória",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "date": {
+          "type": "string",
+          "description": "Data do momento especial",
+          "maxLength": 100
+        },
+        "title": {
+          "type": "string",
+          "description": "Título da memória",
+          "maxLength": 300
+        },
+        "caption": {
+          "type": "string",
+          "description": "Legenda descritiva da foto",
+          "maxLength": 5000
+        },
+        "photoUrl": {
+          "type": "string",
+          "description": "URL da imagem no Firebase Storage ou base64 comprimido",
+          "maxLength": 1048576
+        },
+        "author": {
+          "type": "string",
+          "description": "Quem postou o momento",
+          "maxLength": 100
+        },
+        "location": {
+          "type": "string",
+          "description": "Local onde a foto foi tirada",
+          "maxLength": 200
+        },
+        "authorUid": {
+          "type": "string",
+          "description": "Firebase Auth UID do autor",
+          "maxLength": 128
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Data ISO de criação",
+          "maxLength": 100
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Data ISO da última atualização",
+          "maxLength": 100
+        }
+      },
+      "required": ["id", "date", "title", "photoUrl"]
+    },
+    "Admin": {
+      "title": "Admin",
+      "description": "Documento que autoriza um usuário como administrador do álbum",
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "description": "E-mail do administrador",
+          "maxLength": 200
+        },
+        "role": {
+          "type": "string",
+          "description": "Papel atribuído (admin)",
+          "maxLength": 50
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Data ISO de inclusão",
+          "maxLength": 100
+        }
+      },
+      "required": ["email", "role"]
+    }
+  },
+  "firestore": {
+    "/letters/{letterId}": {
+      "schema": "Letter",
+      "description": "Coleção de cartas e postagens românticas do casal"
+    },
+    "/album_config/{configId}": {
+      "schema": "AlbumConfig",
+      "description": "Configurações globais do álbum (documento 'main')"
+    },
+    "/memories/{memoryId}": {
+      "schema": "TimelineMemory",
+      "description": "Coleção de fotos e datas especiais na linha do tempo 'Nosso Tempo Juntos'"
+    },
+    "/admins/{adminUid}": {
+      "schema": "Admin",
+      "description": "Controle de acesso para administradores e autores autorizados"
+    }
+  }
+}

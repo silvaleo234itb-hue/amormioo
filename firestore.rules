@@ -1,0 +1,205 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 1. Global Safety Net: Default-deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper Primitives
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerifiedUser() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isBootstrappedAdmin() {
+      return isVerifiedUser() && (
+        request.auth.token.email.matches('(?i)zeeremlk@gmail\\.com') ||
+        request.auth.token.email.matches('(?i)arangoohlean@gmail\\.com') ||
+        request.auth.token.email.matches('(?i)silvaleo234\\.itb@gmail\\.com')
+      );
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        isBootstrappedAdmin() ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    // Letter Validation Blueprint
+    function isValidLetter(data) {
+      return data.keys().hasAll(['id', 'order', 'title', 'content', 'published']) &&
+        data.keys().hasOnly([
+          'id', 'order', 'title', 'subtitle', 'date', 'highlightPhrase', 'content',
+          'signature', 'emoji', 'images', 'videoUrl', 'animationIn', 'backgroundTheme',
+          'particleType', 'particleIntensity', 'imagePosition', 'published', 'isFinalLetter',
+          'postType', 'category', 'location', 'likesCount', 'likedBy', 'isLiked',
+          'comments', 'isPinned', 'authorId', 'authorName', 'recipientName', 'authorUid', 'updatedAt'
+        ]) &&
+        isValidId(data.id) &&
+        data.order is number && data.order >= 0 && data.order <= 10000 &&
+        data.title is string && data.title.size() >= 1 && data.title.size() <= 200 &&
+        data.content is string && data.content.size() >= 1 && data.content.size() <= 50000 &&
+        data.published is bool &&
+        (!('subtitle' in data) || (data.subtitle is string && data.subtitle.size() <= 500)) &&
+        (!('date' in data) || (data.date is string && data.date.size() <= 100)) &&
+        (!('highlightPhrase' in data) || (data.highlightPhrase is string && data.highlightPhrase.size() <= 500)) &&
+        (!('signature' in data) || (data.signature is string && data.signature.size() <= 200)) &&
+        (!('emoji' in data) || (data.emoji is string && data.emoji.size() <= 20)) &&
+        (!('images' in data) || (data.images is list && data.images.size() <= 20 && (data.images.size() == 0 || data.images[0] is map))) &&
+        (!('videoUrl' in data) || (data.videoUrl is string && data.videoUrl.size() <= 1000)) &&
+        (!('animationIn' in data) || (data.animationIn is string && data.animationIn.size() <= 50)) &&
+        (!('backgroundTheme' in data) || (data.backgroundTheme is string && data.backgroundTheme.size() <= 50)) &&
+        (!('particleType' in data) || (data.particleType is string && data.particleType.size() <= 50)) &&
+        (!('particleIntensity' in data) || (data.particleIntensity is string && data.particleIntensity.size() <= 50)) &&
+        (!('imagePosition' in data) || (data.imagePosition is string && data.imagePosition.size() <= 50)) &&
+        (!('isFinalLetter' in data) || (data.isFinalLetter is bool)) &&
+        (!('postType' in data) || (data.postType is string && data.postType.size() <= 50)) &&
+        (!('category' in data) || (data.category is string && data.category.size() <= 100)) &&
+        (!('location' in data) || (data.location is string && data.location.size() <= 200)) &&
+        (!('likesCount' in data) || (data.likesCount is number && data.likesCount >= 0 && data.likesCount <= 10000)) &&
+        (!('likedBy' in data) || (data.likedBy is list && data.likedBy.size() <= 100 && (data.likedBy.size() == 0 || (data.likedBy[0] is string && data.likedBy[0].size() <= 100)))) &&
+        (!('isLiked' in data) || (data.isLiked is bool)) &&
+        (!('comments' in data) || (data.comments is list && data.comments.size() <= 200 && (data.comments.size() == 0 || data.comments[0] is map))) &&
+        (!('isPinned' in data) || (data.isPinned is bool)) &&
+        (!('authorId' in data) || (data.authorId is string && data.authorId.size() <= 50)) &&
+        (!('authorName' in data) || (data.authorName is string && data.authorName.size() <= 100)) &&
+        (!('recipientName' in data) || (data.recipientName is string && data.recipientName.size() <= 100)) &&
+        (!('authorUid' in data) || (data.authorUid is string && data.authorUid.size() <= 128 && (!isSignedIn() || data.authorUid == request.auth.uid))) &&
+        (!('updatedAt' in data) || (data.updatedAt is string && data.updatedAt.size() <= 100));
+    }
+
+    // Config Validation Blueprint
+    function isValidConfig(data) {
+      return data.keys().hasAll(['recipientName', 'senderName', 'coverTitle']) &&
+        data.keys().hasOnly([
+          'recipientName', 'senderName', 'coverTitle', 'coverSubtitle', 'coverButtonText',
+          'musicEnabled', 'musicVolume', 'relationshipStartDate', 'heUser', 'sheUser',
+          'authorizedEmails', 'updatedAt'
+        ]) &&
+        data.recipientName is string && data.recipientName.size() >= 1 && data.recipientName.size() <= 100 &&
+        data.senderName is string && data.senderName.size() >= 1 && data.senderName.size() <= 100 &&
+        data.coverTitle is string && data.coverTitle.size() >= 1 && data.coverTitle.size() <= 200 &&
+        (!('coverSubtitle' in data) || (data.coverSubtitle is string && data.coverSubtitle.size() <= 300)) &&
+        (!('coverButtonText' in data) || (data.coverButtonText is string && data.coverButtonText.size() <= 100)) &&
+        (!('musicEnabled' in data) || (data.musicEnabled is bool)) &&
+        (!('musicVolume' in data) || (data.musicVolume is number && data.musicVolume >= 0 && data.musicVolume <= 1)) &&
+        (!('relationshipStartDate' in data) || (data.relationshipStartDate is string && data.relationshipStartDate.size() <= 100)) &&
+        (!('heUser' in data) || (data.heUser is map && data.heUser.keys().hasOnly(['name', 'password', 'avatarEmoji']))) &&
+        (!('sheUser' in data) || (data.sheUser is map && data.sheUser.keys().hasOnly(['name', 'password', 'avatarEmoji']))) &&
+        (!('authorizedEmails' in data) || (data.authorizedEmails is list && data.authorizedEmails.size() <= 20 && (data.authorizedEmails.size() == 0 || (data.authorizedEmails[0] is string && data.authorizedEmails[0].size() <= 200)))) &&
+        (!('updatedAt' in data) || (data.updatedAt is string && data.updatedAt.size() <= 100));
+    }
+
+    // Timeline Memory Validation Blueprint
+    function isValidMemory(data) {
+      return data.keys().hasAll(['id', 'date', 'title', 'photoUrl']) &&
+        data.keys().hasOnly([
+          'id', 'date', 'title', 'caption', 'photoUrl', 'author', 'location',
+          'authorUid', 'createdAt', 'updatedAt'
+        ]) &&
+        isValidId(data.id) &&
+        data.date is string && data.date.size() >= 1 && data.date.size() <= 100 &&
+        data.title is string && data.title.size() >= 1 && data.title.size() <= 300 &&
+        data.photoUrl is string && data.photoUrl.size() >= 1 && data.photoUrl.size() <= 1048576 &&
+        (!('caption' in data) || (data.caption is string && data.caption.size() <= 5000)) &&
+        (!('author' in data) || (data.author is string && data.author.size() <= 100)) &&
+        (!('location' in data) || (data.location is string && data.location.size() <= 200)) &&
+        (!('authorUid' in data) || (data.authorUid is string && data.authorUid.size() <= 128 && (!isSignedIn() || data.authorUid == request.auth.uid))) &&
+        (!('createdAt' in data) || (data.createdAt is string && data.createdAt.size() <= 100)) &&
+        (!('updatedAt' in data) || (data.updatedAt is string && data.updatedAt.size() <= 100));
+    }
+
+    // Admin Validation Blueprint
+    function isValidAdmin(data) {
+      return data.keys().hasAll(['email', 'role']) &&
+        data.keys().hasOnly(['email', 'role', 'createdAt']) &&
+        data.email is string && data.email.size() >= 3 && data.email.size() <= 200 &&
+        data.role is string && data.role == 'admin' &&
+        (!('createdAt' in data) || (data.createdAt is string && data.createdAt.size() <= 100));
+    }
+
+    // Connection test document
+    match /test/connection {
+      allow get: if true;
+      allow list, create, update, delete: if false;
+    }
+
+    // Letters Collection
+    match /letters/{letterId} {
+      allow get: if isValidId(letterId);
+      allow list: if true;
+      allow create: if isValidId(letterId) && isValidLetter(incoming()) && incoming().id == letterId;
+      allow update: if isValidId(letterId) && isValidLetter(incoming()) && incoming().id == existing().id && (
+        isAdmin() ||
+        incoming().diff(existing()).affectedKeys().hasOnly(['id', 'isLiked', 'likesCount', 'likedBy', 'updatedAt']) ||
+        incoming().diff(existing()).affectedKeys().hasOnly(['comments', 'updatedAt']) ||
+        incoming().diff(existing()).affectedKeys().hasOnly([
+          'order', 'title', 'subtitle', 'date', 'highlightPhrase', 'content', 'signature',
+          'emoji', 'images', 'videoUrl', 'animationIn', 'backgroundTheme', 'particleType',
+          'particleIntensity', 'imagePosition', 'published', 'isFinalLetter', 'postType',
+          'category', 'location', 'likesCount', 'likedBy', 'isLiked', 'comments',
+          'isPinned', 'authorId', 'authorName', 'recipientName', 'authorUid', 'updatedAt'
+        ])
+      );
+      allow delete: if isValidId(letterId);
+    }
+
+    // Album Configuration
+    match /album_config/{configId} {
+      allow get: if isValidId(configId) && configId == 'main';
+      allow list: if false;
+      allow create: if isValidId(configId) && configId == 'main' && isValidConfig(incoming());
+      allow update: if isValidId(configId) && configId == 'main' && isValidConfig(incoming()) && (
+        isAdmin() ||
+        incoming().diff(existing()).affectedKeys().hasOnly([
+          'recipientName', 'senderName', 'coverTitle', 'coverSubtitle', 'coverButtonText',
+          'musicEnabled', 'musicVolume', 'relationshipStartDate', 'heUser', 'sheUser',
+          'authorizedEmails', 'updatedAt'
+        ])
+      );
+      allow delete: if false;
+    }
+
+    // Timeline Memories (Tempo Juntos)
+    match /memories/{memoryId} {
+      allow get: if isValidId(memoryId);
+      allow list: if true;
+      allow create: if isValidId(memoryId) && isValidMemory(incoming()) && incoming().id == memoryId;
+      allow update: if isValidId(memoryId) && isValidMemory(incoming()) && incoming().id == existing().id && (
+        isAdmin() ||
+        incoming().diff(existing()).affectedKeys().hasOnly([
+          'date', 'title', 'caption', 'photoUrl', 'author', 'location', 'authorUid', 'updatedAt'
+        ])
+      );
+      allow delete: if isValidId(memoryId);
+    }
+
+    // Admins Collection (PII isolated to owner or verified admin)
+    match /admins/{adminUid} {
+      allow get: if isValidId(adminUid) && isSignedIn() && (request.auth.uid == adminUid || isAdmin());
+      allow list: if false;
+      allow create: if isValidId(adminUid) && isAdmin() && isValidAdmin(incoming());
+      allow update: if isValidId(adminUid) && isAdmin() && isValidAdmin(incoming()) &&
+        incoming().diff(existing()).affectedKeys().hasOnly(['email', 'role']);
+      allow delete: if isValidId(adminUid) && isAdmin();
+    }
+  }
+}
